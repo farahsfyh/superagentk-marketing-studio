@@ -1,10 +1,14 @@
 """SuperAgentK Video Studio for private Streamlit hosting."""
 import os
+import sys
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
 
 import streamlit as st
 from streamlit.errors import StreamlitSecretNotFoundError
 
+# Community Cloud launches this nested entrypoint from the repository root.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import studio
 
 st.set_page_config(page_title="SuperAgentK Video Studio", page_icon="🎬", layout="wide")
