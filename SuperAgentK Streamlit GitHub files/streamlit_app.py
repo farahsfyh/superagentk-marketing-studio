@@ -1,4 +1,6 @@
 """SuperAgentK Video Studio for private Streamlit hosting."""
+import hashlib
+import hmac
 import os
 from decimal import Decimal, InvalidOperation
 
@@ -36,11 +38,33 @@ def cents(value):
     return None
 
 
+def require_workspace_access(api_key):
+    password = str(secret("STUDIO_ACCESS_PASSWORD"))
+    if api_key and len(password) < 16:
+        st.error("Set STUDIO_ACCESS_PASSWORD in Streamlit Secrets to enable this studio.")
+        st.stop()
+    if not password:
+        return
+    verifier = hashlib.sha256(password.encode()).digest()
+    if hmac.compare_digest(st.session_state.get("studio_access", b""), verifier):
+        return
+    st.title("Studio sign-in")
+    with st.form("studio_unlock", clear_on_submit=True):
+        entered = st.text_input("Studio password", type="password")
+        if st.form_submit_button("Unlock studio"):
+            if hmac.compare_digest(hashlib.sha256(entered.encode()).digest(), verifier):
+                st.session_state["studio_access"] = verifier
+                st.rerun()
+            st.error("Incorrect studio password.")
+    st.stop()
+
+
 settings = {
     "key": str(secret("BYTEPLUS_API_KEY")).strip(),
     "model": str(secret("BYTEPLUS_MODEL_ID", "dreamina-seedance-2-0-mini-260615")),
     "region": str(secret("BYTEPLUS_REGION", "ap-southeast-1")),
 }
+require_workspace_access(settings["key"])
 rate = cents(secret("BYTEPLUS_ESTIMATED_USD_PER_SECOND"))
 cap = cents(secret("BYTEPLUS_MONTHLY_CAP_USD"))
 live_ready = bool(settings["key"] and rate and cap and settings["region"] in studio.REGIONS)

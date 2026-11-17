@@ -33,3 +33,13 @@ Set the same values as environment variables or in the ignored `.streamlit/secre
 Job metadata, brand presets and MP4s use SQLite and the server's local disk. Set `STUDIO_DATA_DIR` to a persistent volume when self-hosting. Community Cloud local files can be lost when the app is rebuilt or restarted, so download clips you need to keep. Open the job in the library to resume checking a pending BytePlus generation.
 
 Existing videos, presets, and keys in the Sites app require a separate migration. Enter the model credentials in Streamlit Secrets.
+
+## Streamlit deployment
+
+The existing app uses branch `main` and the entrypoint
+`SuperAgentK Streamlit GitHub files/streamlit_app.py`.
+Install dependencies from the root `requirements.txt`.
+
+Before enabling BytePlus on this deployment, set `STUDIO_ACCESS_PASSWORD`
+in Streamlit Secrets to a strong, unique password of at least 16 characters.
+Keep both this password and `BYTEPLUS_API_KEY` in Streamlit Secrets.
