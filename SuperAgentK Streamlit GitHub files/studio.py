@@ -103,6 +103,14 @@ def database():
             provider TEXT NOT NULL, region TEXT NOT NULL, ratio TEXT NOT NULL, status TEXT NOT NULL,
             cents INTEGER NOT NULL, created REAL NOT NULL, provider_id TEXT, error TEXT)""")
         conn.execute("CREATE TABLE IF NOT EXISTS presets (name TEXT PRIMARY KEY, notes TEXT NOT NULL)")
+        conn.execute("""CREATE TABLE IF NOT EXISTS storyboards (
+            id TEXT PRIMARY KEY, title TEXT NOT NULL, provider TEXT NOT NULL, ratio TEXT NOT NULL,
+            created REAL NOT NULL, render_started REAL, render_error TEXT)""")
+        conn.execute("""CREATE TABLE IF NOT EXISTS storyboard_scenes (
+            storyboard_id TEXT NOT NULL, position INTEGER NOT NULL, label TEXT NOT NULL,
+            duration INTEGER NOT NULL, job_id TEXT NOT NULL, PRIMARY KEY (storyboard_id, position))""")
+        conn.execute("""CREATE TABLE IF NOT EXISTS storyboard_attempts (
+            job_id TEXT PRIMARY KEY, claimed REAL)""")
         yield conn
 
 
@@ -111,9 +119,16 @@ def all_jobs():
         return [dict(row) for row in conn.execute("SELECT * FROM jobs ORDER BY created DESC")]
 
 
+def single_jobs():
+    with database() as conn:
+        return [dict(row) for row in conn.execute("""SELECT * FROM jobs WHERE NOT EXISTS (
+            SELECT 1 FROM storyboard_attempts WHERE job_id=jobs.id) ORDER BY created DESC""")]
+
+
 def latest_job_id():
     with database() as conn:
-        row = conn.execute("SELECT id FROM jobs ORDER BY created DESC LIMIT 1").fetchone()
+        row = conn.execute("""SELECT id FROM jobs WHERE NOT EXISTS (
+            SELECT 1 FROM storyboard_attempts WHERE job_id=jobs.id) ORDER BY created DESC LIMIT 1""").fetchone()
         return row["id"] if row else None
 
 
@@ -170,9 +185,14 @@ def start_job(prompt, ratio, provider, settings, cap, rate, draft=False):
         )
     if not live or draft:
         return job_id
+    submit_seedance(job_id, prompt, ratio, settings, 5)
+    return job_id
+
+
+def submit_seedance(job_id, prompt, ratio, settings, duration):
     parameters = {
         "model": settings["model"], "content": [{"type": "text", "text": prompt}],
-        "ratio": ratio, "duration": 5, "resolution": "720p",
+        "ratio": ratio, "duration": duration, "resolution": "720p",
         "watermark": True, "execution_expires_after": 3600,
     }
     if not settings["model"].startswith("seedance-1-0-"):
@@ -186,7 +206,6 @@ def start_job(prompt, ratio, provider, settings, cap, rate, draft=False):
     except StudioError as exc:
         detail = str(exc) if exc.rejected else f"{exc} Check ModelArk before trying again. The estimate remains reserved."
         update(job_id, "Failed", error=detail, release=exc.rejected)
-    return job_id
 
 
 def media_path(job):
@@ -225,9 +244,9 @@ def save_video(job, url):
         temp.unlink(missing_ok=True)
 
 
-def poll(job, settings):
+def poll(job, settings, queued_at=None):
     if not job["provider_id"]:
-        if time.time() - job["created"] > 120:
+        if time.time() - (queued_at or job["created"]) > 120:
             update(job["id"], "Failed", error="Submission was interrupted. Check ModelArk before retrying.")
         return
     if not settings["key"]:

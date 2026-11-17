@@ -39,3 +39,15 @@ Existing videos, presets, and keys in the Sites app require a separate migration
 The existing app uses branch `main` and the entrypoint
 `SuperAgentK Streamlit GitHub files/streamlit_app.py`.
 Install dependencies from the root `requirements.txt`.
+
+## Storyboards
+
+In **Create video**, select **Storyboard**, choose a provider and aspect ratio,
+then edit the names, prompts, and lengths of two to five scenes. Review the
+estimated generation cost before submitting. Keep the storyboard open to
+submit and check scene jobs, or resume from **Library → Storyboards**.
+You can edit and retry a failed scene individually. Download the combined
+silent MP4 when all scenes finish and FFmpeg has assembled them.
+
+Streamlit Community Cloud installs FFmpeg from `packages.txt`. For local
+runs, install FFmpeg on your PATH or set `STUDIO_FFMPEG` to its executable.
