@@ -78,15 +78,33 @@ def job_details(job_id):
     if job is None:
         st.info("This job is unavailable.")
         return
-    if job["status"] in studio.ACTIVE:
-        try:
-            studio.poll(job, settings)
-        except studio.StudioError as exc:
-            st.warning(str(exc))
-        job = studio.get_job(job_id)
     with st.container(border=True):
-        st.markdown("#### Job details")
-        st.caption(f"{job['provider']} · {job['ratio']} · {job['status']} · ${job['cents'] / 100:.2f} estimate")
+        st.markdown("#### Generation status")
+        banner = st.empty()
+
+        def show_status(status):
+            if status == "Ready":
+                banner.success("Ready · Video completed")
+            elif status == "Failed":
+                banner.error("Failed · Video could not be generated")
+            elif status == "Draft":
+                banner.info("Draft · Saved without submitting")
+            elif status == "Queued":
+                banner.info("Queued · Waiting for BytePlus to accept the job")
+            elif status == "Finishing":
+                banner.info("Finishing · Saving your video")
+            else:
+                banner.info("Generating · BytePlus is working on your video")
+
+        show_status(job["status"])
+        if job["status"] in studio.ACTIVE:
+            try:
+                studio.poll(job, settings)
+            except studio.StudioError as exc:
+                st.warning(str(exc))
+            job = studio.get_job(job_id)
+            show_status(job["status"])
+        st.caption(f"{job['provider']} · {job['ratio']} · ${job['cents'] / 100:.2f} estimate")
         st.write(job["prompt"])
         if job["provider_id"]:
             st.caption(f"BytePlus task ID: {job['provider_id']}")
@@ -125,19 +143,27 @@ if page == "Create video":
             refinements = st.text_input("Optional visual or camera direction", max_chars=300)
             sent = st.form_submit_button("Generate video", type="primary", disabled=live and not live_ready)
             draft = st.form_submit_button("Save draft")
+        submission = st.empty()
         if sent or draft:
             prompt = "\n".join(part for part in [idea.strip(), refinements.strip(), available_presets.get(preset)] if part)
             try:
                 if not idea.strip():
                     raise studio.StudioError("Describe the clip before submitting.")
+                if sent and live:
+                    submission.info("Submitting to BytePlus…")
                 st.session_state.current_job = studio.start_job(
                     prompt, ratio, provider, settings, cap if live else None,
                     (rate or 0) if live else 0, draft=draft,
                 )
             except studio.StudioError as exc:
-                st.error(str(exc))
-        if st.session_state.get("current_job"):
-            job_details(st.session_state.current_job)
+                submission.error(str(exc))
+            else:
+                submission.empty()
+        latest_job_id = st.session_state.get("current_job") or studio.latest_job_id()
+        if latest_job_id:
+            job_details(latest_job_id)
+        else:
+            st.caption("Generation status appears here after you submit a prompt.")
     with summary, st.container(border=True):
         st.markdown("#### Output")
         st.image(str(studio.ASSETS / "still.jpg"))

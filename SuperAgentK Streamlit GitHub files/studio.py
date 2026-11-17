@@ -111,6 +111,12 @@ def all_jobs():
         return [dict(row) for row in conn.execute("SELECT * FROM jobs ORDER BY created DESC")]
 
 
+def latest_job_id():
+    with database() as conn:
+        row = conn.execute("SELECT id FROM jobs ORDER BY created DESC LIMIT 1").fetchone()
+        return row["id"] if row else None
+
+
 def get_job(job_id):
     with database() as conn:
         row = conn.execute("SELECT * FROM jobs WHERE id = ?", (job_id,)).fetchone()
