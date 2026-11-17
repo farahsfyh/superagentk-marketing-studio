@@ -39,7 +39,3 @@ Existing videos, presets, and keys in the Sites app require a separate migration
 The existing app uses branch `main` and the entrypoint
 `SuperAgentK Streamlit GitHub files/streamlit_app.py`.
 Install dependencies from the root `requirements.txt`.
-
-Before enabling BytePlus on this deployment, set `STUDIO_ACCESS_PASSWORD`
-in Streamlit Secrets to a strong, unique password of at least 16 characters.
-Keep both this password and `BYTEPLUS_API_KEY` in Streamlit Secrets.
