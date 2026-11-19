@@ -4,7 +4,13 @@ Instructions for coding agents (Codex, Claude Code) working in this repo. Read t
 
 ## What this app is
 
-A private Streamlit studio that turns a user's text idea into a short AI-generated marketing video.
+The target product is the real-footage Video Editor described in the November 19
+PRD. The owner chose to replace the generator. The current deployed Streamlit
+entrypoint still serves the generator during the engine milestone. The editor
+must pass its reference-reel gate before the replacement UI is deployed.
+See `editor/README.md` for the engine scope, open checks and operator setup.
+
+The following generator rules apply while its code remains in the repository.
 Pages: Create video (Single clip, Storyboard), Library, Usage, Brand kit, Models.
 Providers today: Mock (free, for testing) and BytePlus Seedance (real, billed).
 
@@ -115,3 +121,17 @@ Before cutover, snapshot the existing SQLite records and copy the MP4s
 while they are still available. Add schema migrations, verify record counts
 and object links, and validate Mock end to end before moving live jobs.
 This audit does not provision storage or migrate app data.
+
+## Video Editor engine milestone
+
+- `editor/plan.py` validates versioned real-footage plans.
+- `editor/render.py` renders from supplied original media and returns an explicit
+  technical-check report. Unimplemented PRD quality checks must stay visible as
+  pending, and must be implemented before the final export gate is considered passed.
+- `editor/worker.py` runs outside Streamlit against hosted PostgreSQL and private
+  object storage. Local files are temporary worker scratch. Local-render tooling
+  is for engine QA and the reference-reel gate.
+- `editor/migrations/001_video_editor.sql` is the initial hosted editor schema;
+  apply later changes with new migration files.
+- The November scripts, actual footage/reference reel, hosted service setup and
+  signed-in acceptance testing remain required before replacing the deployed UI.
