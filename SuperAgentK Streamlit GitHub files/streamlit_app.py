@@ -16,9 +16,9 @@ def editor_ui_enabled():
     value = os.environ.get("EDITOR_UI_ENABLED")
     if value is None:
         try:
-            value = st.secrets.get("EDITOR_UI_ENABLED", False)
+            value = st.secrets.get("EDITOR_UI_ENABLED", True)
         except StreamlitSecretNotFoundError:
-            value = False
+            value = True
     return value is True or isinstance(value, str) and value.lower() in ("true", "1")
 
 

@@ -36,8 +36,8 @@ and [OAuth for installed apps](https://developers.google.com/identity/protocols/
 
 ## Configure Streamlit
 
-After this draft is reviewed and the engine gate is accepted, enable the editor
-using these **server-side Streamlit Secrets**. Keep other Secrets entries needed
+The owner requested deployment of the Drive pilot. The editor is now the default
+entrypoint. Configure these **server-side Streamlit Secrets**. Keep other Secrets entries needed
 by the current deployment. Replace the values using the saved authorization file.
 
 ```toml
@@ -59,9 +59,9 @@ operations enforce the configured folder and workspace. The pilot password gives
 access to that shared workspace; individual member roles are future work.
 The application creates no public permissions.
 
-Until `EDITOR_UI_ENABLED` is true, the existing Streamlit entrypoint continues
-to serve the current generator. The flag permits review without changing the
-deployed workflow on merge.
+The existing Streamlit entrypoint now opens the editor by default. Missing
+credentials show the setup screen. An explicit `EDITOR_UI_ENABLED = false`
+selects the legacy generator. The reference and quality gates remain pending.
 
 ## Start the worker
 
