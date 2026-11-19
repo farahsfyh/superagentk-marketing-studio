@@ -135,3 +135,11 @@ This audit does not provision storage or migrate app data.
   apply later changes with new migration files.
 - The November scripts, actual footage/reference reel, hosted service setup and
   signed-in acceptance testing remain required before replacing the deployed UI.
+
+## Google Drive pilot direction
+
+The owner selected Google Drive for the initial Video Editor. Use
+editor/DRIVE_SETUP.md for the pilot backend and its single-worker constraint.
+Drive stores assets, plan/job JSON records, and outputs. The draft Streamlit UI
+is enabled by EDITOR_UI_ENABLED after its reference/quality gate is accepted.
+The app must never run FFmpeg on Community Cloud or write editor data to its disk.

@@ -4,3 +4,5 @@ __pycache__/
 .env.*
 .streamlit/secrets.toml
 studio-data/
+*.credentials.json
+client_secret*.json
