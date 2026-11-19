@@ -1,3 +1,9 @@
+# Google Drive pilot option
+
+The owner selected Google Drive for the initial editor. Start with
+[Drive setup](DRIVE_SETUP.md) for the next UI and local-worker milestone.
+The PostgreSQL implementation below is an alternative for later scaling.
+
 # Video Editor engine
 
 This is the first implementation milestone for replacing the generator with a

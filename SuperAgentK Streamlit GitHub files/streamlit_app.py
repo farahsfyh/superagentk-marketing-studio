@@ -12,6 +12,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import studio
 import storyboard
 
+def editor_ui_enabled():
+    value = os.environ.get("EDITOR_UI_ENABLED")
+    if value is None:
+        try:
+            value = st.secrets.get("EDITOR_UI_ENABLED", False)
+        except StreamlitSecretNotFoundError:
+            value = False
+    return value is True or isinstance(value, str) and value.lower() in ("true", "1")
+
+
+if editor_ui_enabled():
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from editor.app import main as editor_main
+    editor_main()
+    st.stop()
+
 st.set_page_config(page_title="SuperAgentK Video Studio", page_icon="🎬", layout="wide")
 st.markdown("""
 <style>

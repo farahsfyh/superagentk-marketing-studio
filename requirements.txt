@@ -1,2 +1,3 @@
 streamlit==1.52.2
 pyarrow==22.0.0; python_version >= "3.14"
+-r editor/drive-requirements.txt
