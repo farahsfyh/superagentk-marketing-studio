@@ -1,0 +1,35 @@
+{
+  "workspace_id": "example",
+  "project_id": "reference-edit",
+  "version": 1,
+  "template": "event_recap",
+  "formats": ["9:16", "4:5", "1:1", "16:9"],
+  "target_seconds": 20,
+  "title": "Replace with the confirmed event title",
+  "cta": "Replace with the confirmed call to action",
+  "style": {
+    "background": "#10263D",
+    "text": "#FFFFFF",
+    "accent": "#66B6EF",
+    "font_key": "example/style/heading.ttf",
+    "font_licensed": true,
+    "logo_key": "example/style/logo.png"
+  },
+  "clips": {
+    "clip1": {"original_key": "example/originals/clip1.mp4"}
+  },
+  "people": {},
+  "segments": [
+    {
+      "clip": "clip1",
+      "in": 0,
+      "out": 5,
+      "role": "broll",
+      "people": [],
+      "audio": "mute",
+      "frame": "fit",
+      "pause_checked": true,
+      "captions": []
+    }
+  ]
+}

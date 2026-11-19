@@ -1,3 +1,10 @@
+## Video Editor replacement in progress
+
+The November 19 PRD and owner decision change the target to editing real footage.
+The [engine milestone](editor/README.md) adds versioned plans, rendering and
+persistent worker storage. The current deployment remains on the generator until
+the reference-reel gate and the subsequent editor UI milestone are ready.
+
 # SuperAgentK Video Studio
 
 A private Streamlit app with a bundled Mock provider and live BytePlus ModelArk text-to-video. Mock works immediately.
